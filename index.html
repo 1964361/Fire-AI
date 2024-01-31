@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fire AI</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      #chat-container {
+        width: 400px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 300px;
+        overflow-y: scroll;
+        margin-bottom: 10px;
+      }
+
+      #user-input {
+        width: 75%;
+        margin-top: 10px;
+      }
+
+      #submit-button {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chat-container"></div>
+    <input type="text" id="user-input" placeholder="Type your message..." />
+    <button id="submit-button">Send</button>
+
+    <script>
+      const chatContainer = document.getElementById("chat-container");
+      const userInput = document.getElementById("user-input");
+      const submitButton = document.getElementById("submit-button");
+      const apiKey = "3045dd712ffe6e702e3245525ac7fa38";
+
+      submitButton.addEventListener("click", sendMessage);
+      userInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      });
+
+      function sendMessage() {
+        const userMessage = userInput.value;
+        if (!userMessage.trim()) return;
+
+        appendMessage("You", userMessage);
+        processUserMessage(userMessage);
+        userInput.value = "";
+      }
+
+      function processUserMessage(message) {
+        const lowercaseMessage = message.toLowerCase();
+
+        if (containsAny(lowercaseMessage, ["hello", "hi", "hey"])) {
+          respondToGreeting();
+        } else if (
+          containsAny(lowercaseMessage, [
+            "how are you",
+            "what's up",
+            "how do you do",
+          ])
+        ) {
+          respondToHowAreYou();
+        } else if (containsAny(lowercaseMessage, ["weather"])) {
+          getWeather();
+        } else if (containsAny(lowercaseMessage, ["time"])) {
+          respondToTime();
+        } else if (containsAny(lowercaseMessage, ["news", "headlines"])) {
+          getNews();
+        } else if (containsAny(lowercaseMessage, ["joke", "funny"])) {
+          tellJoke();
+        } else if (containsAny(lowercaseMessage, ["define", "meaning of"])) {
+          defineWord();
+        } else if (containsAny(lowercaseMessage, ["calculate", "math"])) {
+          calculateExpression();
+        } else if (containsAny(lowercaseMessage, ["favorite color"])) {
+          respondToFavoriteColor();
+        } else if (containsAny(lowercaseMessage, ["movie", "favorite movie"])) {
+          respondToFavoriteMovie();
+        } else if (containsAny(lowercaseMessage, ["music", "favorite music"])) {
+          respondToFavoriteMusic();
+        } else if (containsAny(lowercaseMessage, ["sport", "favorite sport"])) {
+          respondToFavoriteSport();
+        } else if (containsAny(lowercaseMessage, ["book", "favorite book"])) {
+          respondToFavoriteBook();
+        } else if (containsAny(lowercaseMessage, ["programming", "coding"])) {
+          respondToProgramming();
+        } else if (containsAny(lowercaseMessage, ["riddle"])) {
+          tellRiddle();
+        } else if (containsAny(lowercaseMessage, ["quote"])) {
+          provideQuote();
+        } else if (containsAny(lowercaseMessage, ["history", "historical"])) {
+          shareHistoryFact();
+        } else if (containsAny(lowercaseMessage, ["poem", "poetry"])) {
+          sharePoem();
+        } else if (containsAny(lowercaseMessage, ["trivia"])) {
+          shareTrivia();
+        } else if (containsAny(lowercaseMessage, ["advice"])) {
+          provideAdvice();
+        } else if (
+          containsAny(lowercaseMessage, ["fact", "interesting fact"])
+        ) {
+          shareInterestingFact();
+        } else if (containsAny(lowercaseMessage, ["science", "scientific"])) {
+          shareScienceFact();
+        } else if (containsAny(lowercaseMessage, ["technology", "tech"])) {
+          provideTechnologyInfo();
+        } else if (containsAny(lowercaseMessage, ["movie recommendation"])) {
+          recommendMovie();
+        } else if (containsAny(lowercaseMessage, ["song suggestion"])) {
+          suggestSong();
+        } else if (containsAny(lowercaseMessage, ["science quote"])) {
+          shareScienceQuote();
+        } else if (containsAny(lowercaseMessage, ["rizz", "rizz lines"])) {
+          provideRizzLines();
+        } else if (
+          containsAny(lowercaseMessage, ["video game", "video games"])
+        ) {
+          videogames();
+        } else {
+          defaultResponse();
+        }
+      }
+
+      function containsAny(str, substrings) {
+        for (const substring of substrings) {
+          if (str.includes(substring)) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function respondToGreeting() {
+        const responses = ["Hello!", "Hi there!", "Hey!", "Greetings!"];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function respondToHowAreYou() {
+        const responses = [
+          "I am doing well, thank you!",
+          "Pretty good!",
+          "Not too bad!",
+          "I'm a AI, but I appreciate your asking!",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function getWeather() {
+        const location = prompt("Enter the city for weather:");
+        if (location) {
+          fetchWeatherData(location);
+        } else {
+          appendMessage(
+            "Fire AI",
+            "Weather information requires a location. Please try again."
+          );
+        }
+      }
+
+      function fetchWeatherData(location) {
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=imperial&appid=${apiKey}`;
+
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            const { main, weather, rain } = data;
+            const temperature = main.temp;
+            const description = weather[0].description;
+            const rainChance = rain ? rain["1h"] || 0 : 0;
+
+            const weatherMessage = `Current temperature in ${location}: ${temperature}°F. Description: ${description}. Chance of rain: ${rainChance} mm.`;
+            appendMessage("Fire AI", weatherMessage);
+          })
+          .catch((error) => {
+            console.error("Error fetching weather data:", error);
+            appendMessage(
+              "Fire AI",
+              "Sorry, there was an error fetching weather information. Please try again."
+            );
+          });
+      }
+
+      function respondToTime() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        appendMessage("Fire AI", `The current time is ${time}`);
+      }
+
+      function getNews() {
+        const newsApiKey = "your_news_api_key"; // Replace with your actual news API key
+        const newsApiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${newsApiKey}`;
+
+        fetch(newsApiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            const articles = data.articles;
+            const randomArticle = getRandomItem(articles);
+            const newsMessage = `${randomArticle.title}\n\n${randomArticle.description}\n\nRead more: ${randomArticle.url}`;
+            appendMessage("Fire AI", newsMessage);
+          })
+          .catch((error) => {
+            console.error("Error fetching news data:", error);
+            appendMessage(
+              "Fire AI",
+              "Sorry, there was an error fetching news information. Please try again."
+            );
+          });
+      }
+
+      function tellJoke() {
+        const jokes = [
+          "Why don't scientists trust atoms? Because they make up everything!",
+          "What did one ocean say to the other ocean? Nothing, they just waved.",
+          "Why did the scarecrow win an award? Because he was outstanding in his field!",
+          "Why don't skeletons fight each other? They don't have the guts!",
+          "I told my wife she should embrace her mistakes. She gave me a hug.",
+          "Why did the coffee file a police report? It got mugged.",
+          "Parallel lines have so much in common. It's a shame they'll never meet.",
+          "Why don't we ever tell secrets on a farm? Because the potatoes have eyes and the corn has ears!",
+          "I used to play piano by ear, but now I use my hands and fingers.",
+          "What did one hat say to the other? Stay here, I'm going on ahead!",
+        ];
+        const randomJoke = getRandomItem(jokes);
+        appendMessage("Fire AI", randomJoke);
+      }
+
+      function tellRiddle() {
+        const riddles = [
+          "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",
+          "The more you take, the more you leave behind. What am I?",
+          "What comes once in a minute, twice in a moment, but never in a thousand years?",
+          "The person who makes it, sells it. The person who buys it never uses it. What is it?",
+          "I have keys but open no locks. I have space but no room. You can enter, but you can't go inside. What am I?",
+          "The more you feed it, the more it grows. What is it?",
+          "I'm tall when I'm young, and short when I'm old. What am I?",
+          "I'm not alive, but I grow; I don't have lungs, but I need air. What am I?",
+          "What has a heart that doesn't beat?",
+          "The person who invented it doesn't want it. The person who bought it doesn't need it. The person who needs it doesn't know it. What is it?",
+        ];
+        const randomRiddle = getRandomItem(riddles);
+        appendMessage("Fire AI", randomRiddle);
+      }
+
+      function provideQuote() {
+        const quotes = [
+          "The only way to do great work is to love what you do. - Steve Jobs",
+          "In three words I can sum up everything I've learned about life: it goes on. - Robert Frost",
+          "Believe you can and you're halfway there. - Theodore Roosevelt",
+          "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+          "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+          "Life is what happens when you're busy making other plans. - John Lennon",
+          "The greatest glory in living lies not in never falling, but in rising every time we fall. - Nelson Mandela",
+          "The way to get started is to quit talking and begin doing. - Walt Disney",
+          "Life is really simple, but we insist on making it complicated. - Confucius",
+          "The purpose of our lives is to be happy. - Dalai Lama",
+        ];
+        const randomQuote = getRandomItem(quotes);
+        appendMessage("Fire AI", randomQuote);
+      }
+
+      function shareHistoryFact() {
+        const historyFacts = [
+          "The Great Wall of China is the longest wall in the world, stretching over 13,000 miles.",
+          "The first computer programmer was a woman named Ada Lovelace in the 1800s.",
+          "The Declaration of Independence was adopted on July 4, 1776, declaring the United States independent from Britain.",
+          "The ancient Egyptian pyramids were built as tombs for pharaohs and their consorts.",
+          "The first successful airplane flight was conducted by the Wright brothers on December 17, 1903.",
+          "The world's first recorded game of baseball was played in Hoboken, New Jersey, in 1846.",
+          "The Eiffel Tower was completed in 1889 and served as the entrance arch to the 1889 World's Fair.",
+          "The oldest known written language is Sumerian, dating back to at least 3500 BCE.",
+          "Leonardo da Vinci was not only a painter but also an inventor, scientist, mathematician, and writer.",
+          "The first known use of the word 'computer' was in 1613 to describe a person who performed calculations.",
+        ];
+        const randomHistoryFact = getRandomItem(historyFacts);
+        appendMessage("Fire AI", randomHistoryFact);
+      }
+
+      function sharePoem() {
+        const poems = [
+          "The road not taken, two paths diverged, a choice to make, a journey emerged.",
+          "Roses are red, violets are blue, sugar is sweet, and so are you.",
+          "Stopping by Woods on a Snowy Evening, miles to go before I sleep.",
+          "If you can dream, and not make dreams your master, if you can think, and not make thoughts your aim.",
+          "I wandered lonely as a cloud, that floats on high o'er vales and hills.",
+          "Do not go gentle into that good night, rage, rage against the dying of the light.",
+          "Hope is the thing with feathers that perches in the soul, and sings the tune without the words, and never stops at all.",
+          "Invictus, I am the master of my fate, I am the captain of my soul.",
+          "To be or not to be, that is the question.",
+          "The Raven, nevermore.",
+        ];
+        const randomPoem = getRandomItem(poems);
+        appendMessage("Fire AI", randomPoem);
+      }
+
+      function shareTrivia() {
+        const trivia = [
+          "The honeybee is the only insect that produces food eaten by humans.",
+          "A group of flamingos is called a 'flamboyance.'",
+          "The longest word in the English language without a vowel is 'rhythms.'",
+          "Bananas are berries, but strawberries aren't.",
+          "Octopuses have three hearts.",
+          "Cows have best friends and can become stressed when they are separated.",
+          "The Great Wall of China is not visible from the moon without aid.",
+          "A 'jiffy' is an actual unit of time, equivalent to 1/100th of a second.",
+          "The shortest war in history was between Britain and Zanzibar on August 27, 1896, lasting only 38 minutes.",
+          "There are more possible iterations of a game of chess than there are atoms in the observable universe.",
+        ];
+        const randomTrivia = getRandomItem(trivia);
+        appendMessage("Fire AI", randomTrivia);
+      }
+
+      function provideAdvice() {
+        const advice = [
+          "Take one step at a time; every journey begins with a single step.",
+          "Don't be afraid to ask for help when you need it; seeking support is a sign of strength.",
+          "Focus on what you can control; worrying about things beyond your control can be overwhelming.",
+          "Learn from failures and setbacks; they are opportunities for growth and improvement.",
+          "Take breaks and practice self-care; taking care of yourself is essential for overall well-being.",
+          "Set realistic goals and celebrate small victories along the way.",
+          "Embrace change; it can lead to new opportunities and personal growth.",
+          "Surround yourself with positive influences and supportive people.",
+          "Believe in your abilities; you are capable of more than you may think.",
+          "Stay curious and never stop learning; growth comes from a willingness to explore and discover.",
+        ];
+        const randomAdvice = getRandomItem(advice);
+        appendMessage("Fire AI", randomAdvice);
+      }
+
+      function shareInterestingFact() {
+        const interestingFacts = [
+          "A group of flamingos is called a 'flamboyance.'",
+          "The world's largest desert is Antarctica.",
+          "A single rainforest can produce 20% of the Earth's oxygen.",
+          "Bananas are berries, but strawberries aren't.",
+          "The longest time between two twins being born is 87 days.",
+          "The Great Wall of China was originally built with sticky rice as one of its main ingredients.",
+          "Honey never spoils; archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still perfectly edible.",
+          "Cows have best friends and can become stressed when they are separated.",
+          "The world's oldest known recipe is for beer.",
+          "The oldest known living tree is over 5,000 years old and is a Great Basin bristlecone pine named Methuselah.",
+        ];
+        const randomFact = getRandomItem(interestingFacts);
+        appendMessage("Fire AI", randomFact);
+      }
+
+      function shareScienceFact() {
+        const scienceFacts = [
+          "The speed of light is approximately 299,792 kilometers per second.",
+          "The Earth's atmosphere is composed of about 78% nitrogen, 21% oxygen, and 1% other gases.",
+          "DNA, the blueprint of life, is composed of four nucleotides: adenine (A), thymine (T), cytosine (C), and guanine (G).",
+          "The human brain has about 86 billion neurons.",
+          "Pluto is no longer considered the ninth planet in our solar system; it's classified as a dwarf planet.",
+          "A light-year is a unit of distance, not time, representing the distance that light travels in one year.",
+          "The Milky Way galaxy is estimated to contain over 100 billion stars.",
+          "The world's largest desert is not the Sahara but Antarctica.",
+          "Antibiotics are medications used to treat bacterial infections; they are ineffective against viruses.",
+          "The concept of black holes in space was first theorized by physicist Albert Einstein.",
+        ];
+        const randomScienceFact = getRandomItem(scienceFacts);
+        appendMessage("Fire AI", randomScienceFact);
+      }
+
+      function provideTechnologyInfo() {
+        const techInfo = [
+          "The first computer mouse was invented by Douglas Engelbart in 1964.",
+          "The World Wide Web was created by Sir Tim Berners-Lee in 1989.",
+          "The first electronic computer, ENIAC, weighed more than 27 tons and took up 1,800 square feet of space.",
+          "The term 'bug' in computer science originated when an actual moth caused a malfunction in an early computer.",
+          "The Android operating system for mobile devices was developed by Android Inc., which was later acquired by Google.",
+          "The first computer virus, named Elk Cloner, was created in 1982 for the Apple II computer.",
+          "The term 'Wi-Fi' doesn't stand for anything; it was just a catchy name for the wireless technology.",
+          "The QWERTY keyboard layout, commonly used in English-speaking countries, was designed in 1873 for typewriters.",
+          "The first email was sent by Ray Tomlinson in 1971.",
+          "The average smartphone today has more computing power than the computers used for the Apollo 11 moon landing.",
+        ];
+        const randomTechInfo = getRandomItem(techInfo);
+        appendMessage("Fire AI", randomTechInfo);
+      }
+
+      function recommendMovie() {
+        const movies = [
+          "The Shawshank Redemption",
+          "The Godfather",
+          "Pulp Fiction",
+          "The Dark Knight",
+          "Schindler's List",
+          "Forrest Gump",
+          "The Matrix",
+          "Inception",
+          "Fight Club",
+          "The Silence of the Lambs",
+        ];
+        const randomMovie = getRandomItem(movies);
+        appendMessage(
+          "Fire AI",
+          `I recommend watching "${randomMovie}" for your next movie night.`
+        );
+      }
+
+      function suggestSong() {
+        const songs = [
+          "Bohemian Rhapsody by Queen",
+          "Imagine by John Lennon",
+          "Hotel California by Eagles",
+          "Stairway to Heaven by Led Zeppelin",
+          "Thriller by Michael Jackson",
+          "Like a Rolling Stone by Bob Dylan",
+          "What's Going On by Marvin Gaye",
+          "Billie Jean by Michael Jackson",
+          "Smells Like Teen Spirit by Nirvana",
+          "Purple Haze by Jimi Hendrix",
+        ];
+        const randomSong = getRandomItem(songs);
+        appendMessage("Fire AI", `How about listening to "${randomSong}"?`);
+      }
+
+      function shareScienceQuote() {
+        const scienceQuotes = [
+          "The important achievement of Apollo was demonstrating that humanity is not forever chained to this planet and our visions go rather further than that and our opportunities are unlimited. - Neil Armstrong",
+          "The science of today is the technology of tomorrow. - Edward Teller",
+          "To confine our attention to terrestrial matters would be to limit the human spirit. - Stephen Hawking",
+          "The good thing about science is that it's true whether or not you believe in it. - Neil deGrasse Tyson",
+          "Every action in our lives touches on some chord that will vibrate in eternity. - Edwin Hubbel Chapin",
+          "The saddest aspect of life right now is that science gathers knowledge faster than society gathers wisdom. - Isaac Asimov",
+          "Science knows no country because knowledge belongs to humanity, and is the torch which illuminates the world. - Louis Pasteur",
+          "The science of today is the technology of tomorrow. - Tomorrows Edward Teller",
+          "The most exciting phrase to hear in science, the one that heralds new discoveries, is not 'Eureka!' but 'That's funny...' - Isaac Asimov",
+          "The great tragedy of science - the slaying of a beautiful hypothesis by an ugly fact. - Thomas Huxley",
+        ];
+        const randomScienceQuote = getRandomItem(scienceQuotes);
+        appendMessage("Fire AI", randomScienceQuote);
+      }
+
+      function provideRizzLines() {
+        const rizzLines = [
+          "Hey, I’m sorry to bother you, but my phone must be broken because it doesn’t seem to have your number in it.",
+          "Do you believe in love at first sight? Or, do I have to walk by again?",
+          "Ow! I just bit my lip. Can you kiss it and make it better?",
+          "I can’t taste my cherry lip gloss! Can you give it a try?",
+          "Are you from France? Cause MaDAMN you fine!",
+        ];
+        const randomRizzLine = getRandomItem(rizzLines);
+        appendMessage("Fire AI", randomRizzLine);
+      }
+
+      function respondToFavoriteColor() {
+        const responses = [
+          "My favorite color is blue.",
+          "I don't have a favorite color, but I like all the colors!",
+          "Colors are fascinating, aren't they?",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function respondToFavoriteMovie() {
+        const responses = [
+          "I'm a AI, so I don't watch movies, but I've heard 'The Matrix' is great!",
+          "There are so many good movies out there. What's your favorite?",
+          "Movies can be a great way to relax and unwind.",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function respondToFavoriteMusic() {
+        const responses = [
+          "I don't have personal preferences, but I've heard classical music is quite soothing.",
+          "Music is a universal language that connects us all.",
+          "What's your favorite genre of music?",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function respondToFavoriteSport() {
+        const responses = [
+          "I don't play sports, but I admire the dedication and skill of athletes.",
+          "Sports are a great way to stay active and healthy.",
+          "What's your favorite sport?",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function respondToFavoriteBook() {
+        const responses = [
+          "I enjoy reading information to expand my knowledge.",
+          "Books can take you to different worlds and broaden your perspective.",
+          "What's your favorite book?",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function respondToProgramming() {
+        const responses = [
+          "I love helping with coding questions! What programming language are you interested in?",
+          "Programming is a powerful skill that allows you to create amazing things.",
+          "Coding can be challenging, but it's also incredibly rewarding.",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function defaultResponse() {
+        const responses = [
+          "I don't understand.",
+          "Could you please rephrase that?",
+          "I'm a simple AI and not sure how to respond.",
+          "Sorry, I didn't catch that. Can you try again?",
+          "I'm here to assist you. What can I do for you?",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+      function videogames() {
+        const responses = [
+          "I am merely an AI but my database tells me the most popular video games include, Fortnite, Roblox, Minecraft, Zelda, Mario Kart, Retro Bowl, 1v1 lol and Tetris",
+          "I like all games but the one in mind seems great.",
+        ];
+        const randomResponse = getRandomItem(responses);
+        appendMessage("Fire AI", randomResponse);
+      }
+
+      function getRandomItem(array) {
+        const randomIndex = Math.floor(Math.random() * array.length);
+        return array[randomIndex];
+      }
+
+      function appendMessage(sender, message) {
+        const messageDiv = document.createElement("div");
+        messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
