@@ -182,7 +182,7 @@
             const description = weather[0].description;
             const rainChance = rain ? rain["1h"] || 0 : 0;
 
-            const weatherMessage = `Current temperature in ${location}: ${temperature}°F. Description: ${description}. Chance of rain: ${rainChance} mm.`;
+            const weatherMessage = `Current temperature in ${location}: ${temperature}°F. Description: ${description}. Amount of reain estimated in the next 24 hours: ${rainChance} mm.`;
             appendMessage("Fire AI", weatherMessage);
           })
           .catch((error) => {
@@ -352,6 +352,36 @@
           "Cows have best friends and can become stressed when they are separated.",
           "The world's oldest known recipe is for beer.",
           "The oldest known living tree is over 5,000 years old and is a Great Basin bristlecone pine named Methuselah.",
+          "The speed of light is approximately 299,792 kilometers per second.",
+          "The Earth's atmosphere is composed of about 78% nitrogen, 21% oxygen, and 1% other gases.",
+          "DNA, the blueprint of life, is composed of four nucleotides: adenine (A), thymine (T), cytosine (C), and guanine (G).",
+          "The human brain has about 86 billion neurons.",
+          "Pluto is no longer considered the ninth planet in our solar system; it's classified as a dwarf planet.",
+          "A light-year is a unit of distance, not time, representing the distance that light travels in one year.",
+          "The Milky Way galaxy is estimated to contain over 100 billion stars.",
+          "The world's largest desert is not the Sahara but Antarctica.",
+          "Antibiotics are medications used to treat bacterial infections; they are ineffective against viruses.",
+          "The concept of black holes in space was first theorized by physicist Albert Einstein.",
+          "The honeybee is the only insect that produces food eaten by humans.",
+          "A group of flamingos is called a 'flamboyance.'",
+          "The longest word in the English language without a vowel is 'rhythms.'",
+          "Bananas are berries, but strawberries aren't.",
+          "Octopuses have three hearts.",
+          "Cows have best friends and can become stressed when they are separated.",
+          "The Great Wall of China is not visible from the moon without aid.",
+          "A 'jiffy' is an actual unit of time, equivalent to 1/100th of a second.",
+          "The shortest war in history was between Britain and Zanzibar on August 27, 1896, lasting only 38 minutes.",
+          "There are more possible iterations of a game of chess than there are atoms in the observable universe.",
+          "The Great Wall of China is the longest wall in the world, stretching over 13,000 miles.",
+          "The first computer programmer was a woman named Ada Lovelace in the 1800s.",
+          "The Declaration of Independence was adopted on July 4, 1776, declaring the United States independent from Britain.",
+          "The ancient Egyptian pyramids were built as tombs for pharaohs and their consorts.",
+          "The first successful airplane flight was conducted by the Wright brothers on December 17, 1903.",
+          "The world's first recorded game of baseball was played in Hoboken, New Jersey, in 1846.",
+          "The Eiffel Tower was completed in 1889 and served as the entrance arch to the 1889 World's Fair.",
+          "The oldest known written language is Sumerian, dating back to at least 3500 BCE.",
+          "Leonardo da Vinci was not only a painter but also an inventor, scientist, mathematician, and writer.",
+          "The first known use of the word 'computer' was in 1613 to describe a person who performed calculations.",
         ];
         const randomFact = getRandomItem(interestingFacts);
         appendMessage("Fire AI", randomFact);
