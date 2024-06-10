@@ -38,7 +38,7 @@
     <button id="submit-button">Send</button>
 
     <script>
-const chatContainer = document.getElementById("chat-container");
+     const chatContainer = document.getElementById("chat-container");
 const userInput = document.getElementById("user-input");
 const submitButton = document.getElementById("submit-button");
 const apiKey = "3045dd712ffe6e702e3245525ac7fa38";
@@ -130,10 +130,6 @@ const predefinedResponses = {
     "I can’t taste my cherry lip gloss! Can you give it a try?",
     "Are you from France? Cause MaDAMN you fine!",
   ],
-  love: [
-    "Thank you, I am flatered, but let's keep this profesional.",
-    "I'm flattered, but let's keep this profesional.",
-  ],
 };
 
 const categories = {
@@ -159,7 +155,6 @@ const categories = {
   favoriteBook: ["book", "favorite book"],
   programming: ["programming", "coding"],
   videoGames: ["video game", "video games"],
-  love: ["i love you", "like you a lot"],
 };
 
 submitButton.addEventListener("click", sendMessage);
@@ -181,11 +176,6 @@ function sendMessage() {
 function processUserMessage(message) {
   const lowercaseMessage = message.toLowerCase();
 
-  if (lowercaseMessage.startsWith("can you")) {
-    handleCanYouRequest(lowercaseMessage);
-    return;
-  }
-
   for (const [category, keywords] of Object.entries(categories)) {
     if (containsAny(lowercaseMessage, keywords)) {
       respondToCategory(category);
@@ -199,104 +189,78 @@ function containsAny(str, substrings) {
   return substrings.some(substring => str.includes(substring));
 }
 
-function handleCanYouRequest(message) {
-  const task = message.replace("can you ", "").trim();
-  let response;
-
-  switch (true) {
-    case containsAny(task, categories.greeting):
-      response = "Yes, I can greet you!";
+function respondToCategory(category) {
+  switch (category) {
+    case "greeting":
       respondWithRandom(predefinedResponses.greetings);
       break;
-    case containsAny(task, categories.howAreYou):
-      response = "Yes, I can tell you how I'm doing!";
+    case "howAreYou":
       respondWithRandom(predefinedResponses.howAreYou);
       break;
-    case containsAny(task, categories.weather):
-      response = "Yes, I can get the weather for you!";
+    case "weather":
       getWeather();
       break;
-    case containsAny(task, categories.time):
-      response = "Yes, I can tell you the current time!";
+    case "time":
       respondToTime();
       break;
-    case containsAny(task, categories.news):
-      response = "Yes, I can get the latest news for you!";
+    case "news":
       getNews();
       break;
-    case containsAny(task, categories.joke):
-      response = "Yes, I can tell you a joke!";
+    case "joke":
       respondWithRandom(predefinedResponses.jokes);
       break;
-    case containsAny(task, categories.riddle):
-      response = "Yes, I can tell you a riddle!";
+    case "riddle":
       respondWithRandom(predefinedResponses.riddles);
       break;
-    case containsAny(task, categories.quote):
-      response = "Yes, I can share a quote with you!";
+    case "quote":
       respondWithRandom(predefinedResponses.quotes);
       break;
-    case containsAny(task, categories.trivia):
-      response = "Yes, I can share some trivia with you!";
+    case "trivia":
       respondWithRandom(predefinedResponses.trivia);
       break;
-    case containsAny(task, categories.scienceFact):
-      response = "Yes, I can share a science fact with you!";
+    case "advice":
+      respondWithRandom(predefinedResponses.advice);
+      break;
+    case "scienceFact":
       respondWithRandom(predefinedResponses.scienceFacts);
       break;
-    case containsAny(task, categories.technologyInfo):
-      response = "Yes, I can share some technology information with you!";
+    case "technologyInfo":
       respondWithRandom(predefinedResponses.technologyFacts);
       break;
-    case containsAny(task, categories.movieRecommendation):
-      response = "Yes, I can recommend a movie!";
+    case "movieRecommendation":
       recommendMovie();
       break;
-    case containsAny(task, categories.songSuggestion):
-      response = "Yes, I can suggest a song!";
+    case "songSuggestion":
       suggestSong();
       break;
-    case containsAny(task, categories.scienceQuote):
-      response = "Yes, I can share a science quote!";
+    case "scienceQuote":
       respondWithRandom(predefinedResponses.scienceQuotes);
       break;
-    case containsAny(task, categories.favoriteColor):
-      response = "Yes, I can tell you my favorite color!";
+    case "favoriteColor":
       respondToFavoriteColor();
       break;
-    case containsAny(task, categories.favoriteMovie):
-      response = "Yes, I can tell you my favorite movie!";
+    case "favoriteMovie":
       respondToFavoriteMovie();
       break;
-    case containsAny(task, categories.favoriteMusic):
-      response = "Yes, I can tell you my favorite music!";
+    case "favoriteMusic":
       respondToFavoriteMusic();
       break;
-    case containsAny(task, categories.favoriteSport):
-      response = "Yes, I can tell you my favorite sport!";
+    case "favoriteSport":
       respondToFavoriteSport();
       break;
-    case containsAny(task, categories.favoriteBook):
-      response = "Yes, I can tell you my favorite book!";
+    case "favoriteBook":
       respondToFavoriteBook();
       break;
-    case containsAny(task, categories.programming):
-      response = "Yes, I can help with programming!";
+    case "programming":
       respondToProgramming();
       break;
-    case containsAny(task, categories.videoGames):
-      response = "Yes, I can talk about video games!";
+    case "videoGames":
       videogames();
       break;
-      case containsAny(task, categories.love):
-      response = "Yes, I can talk about love!";
-      love();
-      break;
     default:
-      response = "Sorry, I can't help with that.";
+      defaultResponse();
       break;
   }
-  appendMessage("Fire AI", response);
 }
 
 function getWeather() {
@@ -413,74 +377,6 @@ function defaultResponse() {
   respondWithRandom(responses);
 }
 
-function respondToFavoriteColor() {
-  const responses = [
-    "My favorite color is blue.",
-    "I don't have a favorite color, but I like all the colors!",
-    "Colors are fascinating, aren't they?",
-  ];
-  respondWithRandom(responses);
-}
-
-function respondToFavoriteMovie() {
-  const responses = [
-    "I'm an AI, so I don't watch movies, but I've heard 'The Matrix' is great!",
-    "There are so many good movies out there. What's your favorite?",
-    "Movies can be a great way to relax and unwind.",
-  ];
-  respondWithRandom(responses);
-}
-      function respondTolove() {
-  const responses = [
-    "Thank you, I am flatered, but let's keep this profesional.",
-    "I'm flattered, but let's keep this profesional.",
-  ];
-  respondWithRandom(responses);
-}
-
-function respondToFavoriteMusic() {
-  const responses = [
-    "I don't have personal preferences, but I've heard classical music is quite soothing.",
-    "Music is a universal language that connects us all.",
-    "What's your favorite genre of music?",
-  ];
-  respondWithRandom(responses);
-}
-
-function respondToFavoriteSport() {
-  const responses = [
-    "I don't play sports, but I admire the dedication and skill of athletes.",
-    "Sports are a great way to stay active and healthy.",
-    "What's your favorite sport?",
-  ];
-  respondWithRandom(responses);
-}
-
-function respondToFavoriteBook() {
-  const responses = [
-    "I enjoy reading information to expand my knowledge.",
-    "Books can take you to different worlds and broaden your perspective.",
-    "What's your favorite book?",
-  ];
-  respondWithRandom(responses);
-}
-
-function respondToProgramming() {
-  const responses = [
-    "I love helping with coding questions! What programming language are you interested in?",
-    "Programming is a powerful skill that allows you to create amazing things.",
-    "Coding can be challenging, but it's also incredibly rewarding.",
-  ];
-  respondWithRandom(responses);
-}
-
-function videogames() {
-  const responses = [
-    "I am merely an AI, but my database tells me the most popular video games include Fortnite, Roblox, Minecraft, Zelda, Mario Kart, Retro Bowl, 1v1 lol, and Tetris.",
-    "I like all games, but the one in mind seems great.",
-  ];
-  respondWithRandom(responses);
-}
     </script>
   </body>
 </html>
