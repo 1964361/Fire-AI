@@ -1,397 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Application</title>
-  <style>
-    #chat-container {
-      border: 1px solid #ccc;
-      height: 300px;
-      overflow-y: scroll;
-      padding: 10px;
-    }
-    #user-input {
-      width: 80%;
-    }
-  </style>
-</head>
-<body>
-  <div id="chat-container"></div>
-  <input type="text" id="user-input" placeholder="Type a message...">
-  <button id="submit-button">Send</button>
-  <button id="clear-chat">Clear Chat</button>
-  <button id="delete-cookie">Delete Chat History</button>
-
-  <script>
-    const chatContainer = document.getElementById("chat-container");
-    const userInput = document.getElementById("user-input");
-    const submitButton = document.getElementById("submit-button");
-    const clearChatButton = document.getElementById("clear-chat");
-    const deleteCookieButton = document.getElementById("delete-cookie");
-    const apiKey = "3045dd712ffe6e702e3245525ac7fa38";
-
-    const predefinedResponses = {
-      greetings: ["Hello!", "Hi there!", "Hey!", "Greetings!"],
-      howAreYou: [
-        "I am doing well, thank you!",
-        "Pretty good!",
-        "Not too bad!",
-        "I'm an AI, but I appreciate your asking!",
-      ],
-      jokes: [
-        "Why don't scientists trust atoms? Because they make up everything!",
-        "What did one ocean say to the other ocean? Nothing, they just waved.",
-        "Why did the scarecrow win an award? Because he was outstanding in his field!",
-        "Why don't skeletons fight each other? They don't have the guts!",
-        "I told my wife she should embrace her mistakes. She gave me a hug.",
-        "Why did the coffee file a police report? It got mugged.",
-        "Parallel lines have so much in common. It's a shame they'll never meet.",
-        "Why don't we ever tell secrets on a farm? Because the potatoes have eyes and the corn has ears!",
-        "I used to play piano by ear, but now I use my hands and fingers.",
-        "What did one hat say to the other? Stay here, I'm going on ahead!",
-      ],
-      riddles: [
-        "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",
-        "The more you take, the more you leave behind. What am I?",
-        "What comes once in a minute, twice in a moment, but never in a thousand years?",
-        "The person who makes it, sells it. The person who buys it never uses it. What is it?",
-        "I have keys but open no locks. I have space but no room. You can enter, but you can't go inside. What am I?",
-        "The more you feed it, the more it grows. What is it?",
-        "I'm tall when I'm young, and short when I'm old. What am I?",
-        "I'm not alive, but I grow; I don't have lungs, but I need air. What am I?",
-        "What has a heart that doesn't beat?",
-        "The person who invented it doesn't want it. The person who bought it doesn't need it. The person who needs it doesn't know it. What is it?",
-      ],
-      quotes: [
-        "The only way to do great work is to love what you do. - Steve Jobs",
-        "In three words I can sum up everything I've learned about life: it goes on. - Robert Frost",
-        "Believe you can and you're halfway there. - Theodore Roosevelt",
-        "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
-        "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
-        "Life is what happens when you're busy making other plans. - John Lennon",
-        "The greatest glory in living lies not in never falling, but in rising every time we fall. - Nelson Mandela",
-        "The way to get started is to quit talking and begin doing. - Walt Disney",
-        "Life is really simple, but we insist on making it complicated. - Confucius",
-        "The purpose of our lives is to be happy. - Dalai Lama",
-      ],
-      trivia: [
-        "The honeybee is the only insect that produces food eaten by humans.",
-        "A group of flamingos is called a 'flamboyance.'",
-        "The longest word in the English language without a vowel is 'rhythms.'",
-        "Bananas are berries, but strawberries aren't.",
-        "Octopuses have three hearts.",
-        "Cows have best friends and can become stressed when they are separated.",
-        "The Great Wall of China is not visible from the moon without aid.",
-        "A 'jiffy' is an actual unit of time, equivalent to 1/100th of a second.",
-        "The shortest war in history was between Britain and Zanzibar on August 27, 1896, lasting only 38 minutes.",
-        "There are more possible iterations of a game of chess than there are atoms in the observable universe.",
-      ],
-      scienceFacts: [
-        "The speed of light is approximately 299,792 kilometers per second.",
-        "The Earth's atmosphere is composed of about 78% nitrogen, 21% oxygen, and 1% other gases.",
-        "DNA, the blueprint of life, is composed of four nucleotides: adenine (A), thymine (T), cytosine (C), and guanine (G).",
-        "The human brain has about 86 billion neurons.",
-        "Pluto is no longer considered the ninth planet in our solar system; it's classified as a dwarf planet.",
-        "A light-year is a unit of distance, not time, representing the distance that light travels in one year.",
-        "The Milky Way galaxy is estimated to contain over 100 billion stars.",
-        "The world's largest desert is not the Sahara but Antarctica.",
-        "Antibiotics are medications used to treat bacterial infections; they are ineffective against viruses.",
-        "The concept of black holes in space was first theorized by physicist Albert Einstein.",
-      ],
-      technologyFacts: [
-        "The first computer mouse was invented by Douglas Engelbart in 1964.",
-        "The World Wide Web was created by Sir Tim Berners-Lee in 1989.",
-        "The first electronic computer, ENIAC, weighed more than 27 tons and took up 1,800 square feet of space.",
-        "The term 'bug' in computer science originated when an actual moth caused a malfunction in an early computer.",
-        "The Android operating system for mobile devices was developed by Android Inc., which was later acquired by Google.",
-        "The first computer virus, named Elk Cloner, was created in 1982 for the Apple II computer.",
-        "The term 'Wi-Fi' doesn't stand for anything; it was just a catchy name for the wireless technology.",
-        "The QWERTY keyboard layout, commonly used in English-speaking countries, was designed in 1873 for typewriters.",
-        "The first email was sent by Ray Tomlinson in 1971.",
-        "The average smartphone today has more computing power than the computers used for the Apollo 11 moon landing.",
-      ],
-      rizzLines: [
-        "Hey, I’m sorry to bother you, but my phone must be broken because it doesn’t seem to have your number in it.",
-        "Do you believe in love at first sight? Or, do I have to walk by again?",
-        "Ow! I just bit my lip. Can you kiss it and make it better?",
-        "I can’t taste my cherry lip gloss! Can you give it a try?",
-        "Are you from France? Cause MaDAMN you fine!",
-      ],
-    };
-
-    const categories = {
-      greeting: ["hello", "hi", "hey"],
-      howAreYou: ["how are you", "what's up", "how do you do"],
-      weather: ["weather"],
-      time: ["time"],
-      news: ["news", "headlines"],
-      joke: ["joke", "funny"],
-      riddle: ["riddle"],
-      quote: ["quote"],
-      trivia: ["trivia"],
-      advice: ["advice"],
-      scienceFact: ["science", "scientific"],
-      technologyInfo: ["technology", "tech"],
-      movieRecommendation: ["movie recommendation"],
-      songSuggestion: ["song suggestion"],
-      scienceQuote: ["science quote"],
-      favoriteColor: ["favorite color"],
-      favoriteMovie: ["movie", "favorite movie"],
-      favoriteMusic: ["music", "favorite music"],
-      favoriteSport: ["sport", "favorite sport"],
-      favoriteBook: ["book", "favorite book"],
-      programming: ["programming", "coding"],
-      videoGames: ["video game", "video games"],
-    };
-
-    submitButton.addEventListener("click", sendMessage);
-    userInput.addEventListener("keyup", function (event) {
-      if (event.key === "Enter") {
-        sendMessage();
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fire AI</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
       }
-    });
-    clearChatButton.addEventListener("click", clearChat);
-    deleteCookieButton.addEventListener("click", deleteChatHistory);
 
-    function sendMessage() {
-      const userMessage = userInput.value;
-      if (!userMessage.trim()) return;
-
-      appendMessage("You", userMessage);
-      processUserMessage(userMessage);
-      userInput.value = "";
-    }
-
-    function processUserMessage(message) {
-      const lowercaseMessage = message.toLowerCase();
-
-      for (const [category, keywords] of Object.entries(categories)) {
-        if (containsAny(lowercaseMessage, keywords)) {
-          respondToCategory(category);
-          return;
-        }
+      #chat-container {
+        width: 75%;
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 75%;
+        overflow-y: scroll;
+        margin-bottom: 10px;
       }
+
+      #user-input {
+        width: 75%;
+        margin-top: 10px;
+      }
+
+      #submit-button {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chat-container"></div>
+    <input type="text" id="user-input" placeholder="Type your message..." />
+    <button id="submit-button">Send</button>
+
+    <script>
+     const chatContainer = document.getElementById("chat-container");
+const userInput = document.getElementById("user-input");
+const submitButton = document.getElementById("submit-button");
+const apiKey = "3045dd712ffe6e702e3245525ac7fa38";
+
+const predefinedResponses = {
+  greetings: ["Hello!", "Hi there!", "Hey!", "Greetings!"],
+  howAreYou: [
+    "I am doing well, thank you!",
+    "Pretty good!",
+    "Not too bad!",
+    "I'm an AI, but I appreciate your asking!",
+  ],
+  jokes: [
+    "Why don't scientists trust atoms? Because they make up everything!",
+    "What did one ocean say to the other ocean? Nothing, they just waved.",
+    "Why did the scarecrow win an award? Because he was outstanding in his field!",
+    "Why don't skeletons fight each other? They don't have the guts!",
+    "I told my wife she should embrace her mistakes. She gave me a hug.",
+    "Why did the coffee file a police report? It got mugged.",
+    "Parallel lines have so much in common. It's a shame they'll never meet.",
+    "Why don't we ever tell secrets on a farm? Because the potatoes have eyes and the corn has ears!",
+    "I used to play piano by ear, but now I use my hands and fingers.",
+    "What did one hat say to the other? Stay here, I'm going on ahead!",
+  ],
+  riddles: [
+    "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",
+    "The more you take, the more you leave behind. What am I?",
+    "What comes once in a minute, twice in a moment, but never in a thousand years?",
+    "The person who makes it, sells it. The person who buys it never uses it. What is it?",
+    "I have keys but open no locks. I have space but no room. You can enter, but you can't go inside. What am I?",
+    "The more you feed it, the more it grows. What is it?",
+    "I'm tall when I'm young, and short when I'm old. What am I?",
+    "I'm not alive, but I grow; I don't have lungs, but I need air. What am I?",
+    "What has a heart that doesn't beat?",
+    "The person who invented it doesn't want it. The person who bought it doesn't need it. The person who needs it doesn't know it. What is it?",
+  ],
+  quotes: [
+    "The only way to do great work is to love what you do. - Steve Jobs",
+    "In three words I can sum up everything I've learned about life: it goes on. - Robert Frost",
+    "Believe you can and you're halfway there. - Theodore Roosevelt",
+    "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+    "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+    "Life is what happens when you're busy making other plans. - John Lennon",
+    "The greatest glory in living lies not in never falling, but in rising every time we fall. - Nelson Mandela",
+    "The way to get started is to quit talking and begin doing. - Walt Disney",
+    "Life is really simple, but we insist on making it complicated. - Confucius",
+    "The purpose of our lives is to be happy. - Dalai Lama",
+  ],
+  trivia: [
+    "The honeybee is the only insect that produces food eaten by humans.",
+    "A group of flamingos is called a 'flamboyance.'",
+    "The longest word in the English language without a vowel is 'rhythms.'",
+    "Bananas are berries, but strawberries aren't.",
+    "Octopuses have three hearts.",
+    "Cows have best friends and can become stressed when they are separated.",
+    "The Great Wall of China is not visible from the moon without aid.",
+    "A 'jiffy' is an actual unit of time, equivalent to 1/100th of a second.",
+    "The shortest war in history was between Britain and Zanzibar on August 27, 1896, lasting only 38 minutes.",
+    "There are more possible iterations of a game of chess than there are atoms in the observable universe.",
+  ],
+  scienceFacts: [
+    "The speed of light is approximately 299,792 kilometers per second.",
+    "The Earth's atmosphere is composed of about 78% nitrogen, 21% oxygen, and 1% other gases.",
+    "DNA, the blueprint of life, is composed of four nucleotides: adenine (A), thymine (T), cytosine (C), and guanine (G).",
+    "The human brain has about 86 billion neurons.",
+    "Pluto is no longer considered the ninth planet in our solar system; it's classified as a dwarf planet.",
+    "A light-year is a unit of distance, not time, representing the distance that light travels in one year.",
+    "The Milky Way galaxy is estimated to contain over 100 billion stars.",
+    "The world's largest desert is not the Sahara but Antarctica.",
+    "Antibiotics are medications used to treat bacterial infections; they are ineffective against viruses.",
+    "The concept of black holes in space was first theorized by physicist Albert Einstein.",
+  ],
+  technologyFacts: [
+    "The first computer mouse was invented by Douglas Engelbart in 1964.",
+    "The World Wide Web was created by Sir Tim Berners-Lee in 1989.",
+    "The first electronic computer, ENIAC, weighed more than 27 tons and took up 1,800 square feet of space.",
+    "The term 'bug' in computer science originated when an actual moth caused a malfunction in an early computer.",
+    "The Android operating system for mobile devices was developed by Android Inc., which was later acquired by Google.",
+    "The first computer virus, named Elk Cloner, was created in 1982 for the Apple II computer.",
+    "The term 'Wi-Fi' doesn't stand for anything; it was just a catchy name for the wireless technology.",
+    "The QWERTY keyboard layout, commonly used in English-speaking countries, was designed in 1873 for typewriters.",
+    "The first email was sent by Ray Tomlinson in 1971.",
+    "The average smartphone today has more computing power than the computers used for the Apollo 11 moon landing.",
+  ],
+  rizzLines: [
+    "Hey, I’m sorry to bother you, but my phone must be broken because it doesn’t seem to have your number in it.",
+    "Do you believe in love at first sight? Or, do I have to walk by again?",
+    "Ow! I just bit my lip. Can you kiss it and make it better?",
+    "I can’t taste my cherry lip gloss! Can you give it a try?",
+    "Are you from France? Cause MaDAMN you fine!",
+  ],
+};
+
+const categories = {
+  greeting: ["hello", "hi", "hey"],
+  howAreYou: ["how are you", "what's up", "how do you do"],
+  weather: ["weather"],
+  time: ["time"],
+  news: ["news", "headlines"],
+  joke: ["joke", "funny"],
+  riddle: ["riddle"],
+  quote: ["quote"],
+  trivia: ["trivia"],
+  advice: ["advice"],
+  scienceFact: ["science", "scientific"],
+  technologyInfo: ["technology", "tech"],
+  movieRecommendation: ["movie recommendation"],
+  songSuggestion: ["song suggestion"],
+  scienceQuote: ["science quote"],
+  favoriteColor: ["favorite color"],
+  favoriteMovie: ["movie", "favorite movie"],
+  favoriteMusic: ["music", "favorite music"],
+  favoriteSport: ["sport", "favorite sport"],
+  favoriteBook: ["book", "favorite book"],
+  programming: ["programming", "coding"],
+  videoGames: ["video game", "video games"],
+};
+
+submitButton.addEventListener("click", sendMessage);
+userInput.addEventListener("keyup", function (event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
+});
+
+function sendMessage() {
+  const userMessage = userInput.value;
+  if (!userMessage.trim()) return;
+
+  appendMessage("You", userMessage);
+  processUserMessage(userMessage);
+  userInput.value = "";
+}
+
+function processUserMessage(message) {
+  const lowercaseMessage = message.toLowerCase();
+
+  for (const [category, keywords] of Object.entries(categories)) {
+    if (containsAny(lowercaseMessage, keywords)) {
+      respondToCategory(category);
+      return;
+    }
+  }
+  defaultResponse();
+}
+
+function containsAny(str, substrings) {
+  return substrings.some(substring => str.includes(substring));
+}
+
+function respondToCategory(category) {
+  switch (category) {
+    case "greeting":
+      respondWithRandom(predefinedResponses.greetings);
+      break;
+    case "howAreYou":
+      respondWithRandom(predefinedResponses.howAreYou);
+      break;
+    case "weather":
+      getWeather();
+      break;
+    case "time":
+      respondToTime();
+      break;
+    case "news":
+      getNews();
+      break;
+    case "joke":
+      respondWithRandom(predefinedResponses.jokes);
+      break;
+    case "riddle":
+      respondWithRandom(predefinedResponses.riddles);
+      break;
+    case "quote":
+      respondWithRandom(predefinedResponses.quotes);
+      break;
+    case "trivia":
+      respondWithRandom(predefinedResponses.trivia);
+      break;
+    case "advice":
+      respondWithRandom(predefinedResponses.advice);
+      break;
+    case "scienceFact":
+      respondWithRandom(predefinedResponses.scienceFacts);
+      break;
+    case "technologyInfo":
+      respondWithRandom(predefinedResponses.technologyFacts);
+      break;
+    case "movieRecommendation":
+      recommendMovie();
+      break;
+    case "songSuggestion":
+      suggestSong();
+      break;
+    case "scienceQuote":
+      respondWithRandom(predefinedResponses.scienceQuotes);
+      break;
+    case "favoriteColor":
+      respondToFavoriteColor();
+      break;
+    case "favoriteMovie":
+      respondToFavoriteMovie();
+      break;
+    case "favoriteMusic":
+      respondToFavoriteMusic();
+      break;
+    case "favoriteSport":
+      respondToFavoriteSport();
+      break;
+    case "favoriteBook":
+      respondToFavoriteBook();
+      break;
+    case "programming":
+      respondToProgramming();
+      break;
+    case "videoGames":
+      videogames();
+      break;
+    default:
       defaultResponse();
-    }
+      break;
+  }
+}
 
-    function containsAny(str, substrings) {
-      return substrings.some(substring => str.includes(substring));
-    }
+function getWeather() {
+  const location = prompt("Enter the city for weather:");
+  if (location) {
+    fetchWeatherData(location);
+  } else {
+    appendMessage("Fire AI", "Weather information requires a location. Please try again.");
+  }
+}
 
-    function respondToCategory(category) {
-      switch (category) {
-        case "greeting":
-          respondWithRandom(predefinedResponses.greetings);
-          break;
-        case "howAreYou":
-          respondWithRandom(predefinedResponses.howAreYou);
-          break;
-        case "weather":
-          getWeather();
-          break;
-        case "time":
-          respondToTime();
-          break;
-        case "news":
-          getNews();
-          break;
-        case "joke":
-          respondWithRandom(predefinedResponses.jokes);
-          break;
-        case "riddle":
-          respondWithRandom(predefinedResponses.riddles);
-          break;
-        case "quote":
-          respondWithRandom(predefinedResponses.quotes);
-          break;
-        case "trivia":
-          respondWithRandom(predefinedResponses.trivia);
-          break;
-        case "advice":
-          respondWithRandom(predefinedResponses.advice);
-          break;
-        case "scienceFact":
-          respondWithRandom(predefinedResponses.scienceFacts);
-          break;
-        case "technologyInfo":
-          respondWithRandom(predefinedResponses.technologyFacts);
-          break;
-        case "movieRecommendation":
-          recommendMovie();
-          break;
-        case "songSuggestion":
-          suggestSong();
-          break;
-        case "scienceQuote":
-          respondWithRandom(predefinedResponses.scienceQuotes);
-          break;
-        case "favoriteColor":
-          respondToFavoriteColor();
-          break;
-        case "favoriteMovie":
-          respondToFavoriteMovie();
-          break;
-        case "favoriteMusic":
-          respondToFavoriteMusic();
-          break;
-        case "favoriteSport":
-          respondToFavoriteSport();
-          break;
-        case "favoriteBook":
-          respondToFavoriteBook();
-          break;
-        case "programming":
-          respondToProgramming();
-          break;
-        case "videoGames":
-          videogames();
-          break;
-        default:
-          defaultResponse();
-          break;
-      }
-    }
+function fetchWeatherData(location) {
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=imperial&appid=${apiKey}`;
 
-    function getWeather() {
-      const location = prompt("Enter the city for weather:");
-      if (location) {
-        fetchWeatherData(location);
-      } else {
-        appendMessage("Fire AI", "Weather information requires a location. Please try again.");
-      }
-    }
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const { main, weather, rain } = data;
+      const temperature = main.temp;
+      const description = weather[0].description;
+      const rainChance = rain ? rain["1h"] || 0 : 0;
 
-    function fetchWeatherData(location) {
-      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=imperial&appid=${apiKey}`;
+      const weatherMessage = `Current temperature in ${location}: ${temperature}°F. Description: ${description}. Amount of rain estimated in the next 1 hour: ${rainChance} mm.`;
+      appendMessage("Fire AI", weatherMessage);
+    })
+    .catch(error => {
+      console.error("Error fetching weather data:", error);
+      appendMessage("Fire AI", "Sorry, there was an error fetching weather information. Please try again.");
+    });
+}
 
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          const { main, weather, rain } = data;
-          const temperature = main.temp;
-          const description = weather[0].description;
-          const rainChance = rain ? rain["1h"] || 0 : 0;
+function respondToTime() {
+  const now = new Date();
+  const time = now.toLocaleTimeString();
+  appendMessage("Fire AI", `The current time is ${time}`);
+}
 
-          const weatherMessage = `Current temperature in ${location}: ${temperature}°F. Description: ${description}. Amount of rain estimated in the next 1 hour: ${rainChance} mm.`;
-          appendMessage("Fire AI", weatherMessage);
-        })
-        .catch(error => {
-          console.error("Error fetching weather data:", error);
-          appendMessage("Fire AI", "Sorry, there was an error fetching weather information. Please try again.");
-        });
-    }
+function getNews() {
+  const newsApiKey = "your_news_api_key"; // Replace with your actual news API key
+  const newsApiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${newsApiKey}`;
 
-    function respondToTime() {
-      const now = new Date();
-      const time = now.toLocaleTimeString();
-      appendMessage("Fire AI", `The current time is ${time}`);
-    }
+  fetch(newsApiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const articles = data.articles;
+      const randomArticle = getRandomItem(articles);
+      const newsMessage = `${randomArticle.title}\n\n${randomArticle.description}\n\nRead more: ${randomArticle.url}`;
+      appendMessage("Fire AI", newsMessage);
+    })
+    .catch(error => {
+      console.error("Error fetching news data:", error);
+      appendMessage("Fire AI", "Sorry, there was an error fetching news information. Please try again.");
+    });
+}
 
-    function getNews() {
-      const newsApiKey = "your_news_api_key"; // Replace with your actual news API key
-      const newsApiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${newsApiKey}`;
+function recommendMovie() {
+  const movies = [
+    "The Shawshank Redemption",
+    "The Godfather",
+    "Pulp Fiction",
+    "The Dark Knight",
+    "Schindler's List",
+    "Forrest Gump",
+    "The Matrix",
+    "Inception",
+    "Fight Club",
+    "The Silence of the Lambs",
+  ];
+  const randomMovie = getRandomItem(movies);
+  appendMessage("Fire AI", `I recommend watching "${randomMovie}" for your next movie night.`);
+}
 
-      fetch(newsApiUrl)
-        .then(response => response.json())
-        .then(data => {
-          const articles = data.articles;
-          const randomArticle = getRandomItem(articles);
-          const newsMessage = `${randomArticle.title}\n\n${randomArticle.description}\n\nRead more: ${randomArticle.url}`;
-          appendMessage("Fire AI", newsMessage);
-        })
-        .catch(error => {
-          console.error("Error fetching news data:", error);
-          appendMessage("Fire AI", "Sorry, there was an error fetching news information. Please try again.");
-        });
-    }
+function suggestSong() {
+  const songs = [
+    "Bohemian Rhapsody by Queen",
+    "Imagine by John Lennon",
+    "Hotel California by Eagles",
+    "Stairway to Heaven by Led Zeppelin",
+    "Thriller by Michael Jackson",
+    "Like a Rolling Stone by Bob Dylan",
+    "What's Going On by Marvin Gaye",
+    "Billie Jean by Michael Jackson",
+    "Smells Like Teen Spirit by Nirvana",
+    "Purple Haze by Jimi Hendrix",
+  ];
+  const randomSong = getRandomItem(songs);
+  appendMessage("Fire AI", `How about listening to "${randomSong}"?`);
+}
 
-    function recommendMovie() {
-      const movies = [
-        "The Shawshank Redemption",
-        "The Godfather",
-        "Pulp Fiction",
-        "The Dark Knight",
-        "Schindler's List",
-        "Forrest Gump",
-        "The Matrix",
-        "Inception",
-        "Fight Club",
-        "The Silence of the Lambs",
-      ];
-      const randomMovie = getRandomItem(movies);
-      appendMessage("Fire AI", `I recommend watching "${randomMovie}" for your next movie night.`);
-    }
+function respondWithRandom(array) {
+  const randomItem = getRandomItem(array);
+  appendMessage("Fire AI", randomItem);
+}
 
-    function suggestSong() {
-      const songs = [
-        "Bohemian Rhapsody by Queen",
-        "Imagine by John Lennon",
-        "Hotel California by Eagles",
-        "Stairway to Heaven by Led Zeppelin",
-        "Thriller by Michael Jackson",
-        "Like a Rolling Stone by Bob Dylan",
-        "What's Going On by Marvin Gaye",
-        "Billie Jean by Michael Jackson",
-        "Smells Like Teen Spirit by Nirvana",
-        "Purple Haze by Jimi Hendrix",
-      ];
-      const randomSong = getRandomItem(songs);
-      appendMessage("Fire AI", `How about listening to "${randomSong}"?`);
-    }
+function getRandomItem(array) {
+  const randomIndex = Math.floor(Math.random() * array.length);
+  return array[randomIndex];
+}
 
-    function respondWithRandom(array) {
-      const randomItem = getRandomItem(array);
-      appendMessage("Fire AI", randomItem);
-    }
+function appendMessage(sender, message) {
+  const messageDiv = document.createElement("div");
+  messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+  chatContainer.appendChild(messageDiv);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
 
-    function getRandomItem(array) {
-      const randomIndex = Math.floor(Math.random() * array.length);
-      return array[randomIndex];
-    }
+function defaultResponse() {
+  const responses = [
+    "I don't understand.",
+    "Could you please rephrase that?",
+    "I'm a simple AI and not sure how to respond.",
+    "Sorry, I didn't catch that. Can you try again?",
+  ];
+  respondWithRandom(responses);
+}
 
-    function appendMessage(sender, message) {
-      const messageDiv = document.createElement("div");
-      messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
-      chatContainer.appendChild(messageDiv);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      saveChatToCookies(sender, message);
-    }
-
-    function saveChatToCookies(sender, message) {
-      const chatHistory = getChatHistory();
-      chatHistory.push({ sender, message });
-      document.cookie = `chatHistory=${JSON.stringify(chatHistory)};path=/;max-age=31536000`;
-    }
-
-    function getChatHistory() {
-      const cookieValue = document.cookie
-        .split("; ")
-        .find(row => row.startsWith("chatHistory="));
-      return cookieValue ? JSON.parse(cookieValue.split("=")[1]) : [];
-    }
-
-    function loadChatHistory() {
-      const chatHistory = getChatHistory();
-      chatHistory.forEach(chat => {
-        const messageDiv = document.createElement("div");
-        messageDiv.innerHTML = `<strong>${chat.sender}:</strong> ${chat.message}`;
-        chatContainer.appendChild(messageDiv);
-      });
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    function clearChat() {
-      chatContainer.innerHTML = "";
-    }
-
-    function deleteChatHistory() {
-      document.cookie = "chatHistory=;path=/;max-age=0";
-      clearChat();
-    }
-
-    loadChatHistory();
-  </script>
-</body>
+    </script>
+  </body>
 </html>
