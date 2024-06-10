@@ -288,6 +288,10 @@ function handleCanYouRequest(message) {
       response = "Yes, I can talk about video games!";
       videogames();
       break;
+      case containsAny(task, categories.love):
+      response = "Yes, I can talk about love!";
+      videogames();
+      break;
     default:
       response = "Sorry, I can't help with that.";
       break;
@@ -423,6 +427,13 @@ function respondToFavoriteMovie() {
     "I'm an AI, so I don't watch movies, but I've heard 'The Matrix' is great!",
     "There are so many good movies out there. What's your favorite?",
     "Movies can be a great way to relax and unwind.",
+  ];
+  respondWithRandom(responses);
+}
+      function respondTolove() {
+  const responses = [
+    "Thank you, I am flatered, but let's keep this profesional.",
+    "I'm flattered, but let's keep this profesional.",
   ];
   respondWithRandom(responses);
 }
