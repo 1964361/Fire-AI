@@ -38,7 +38,7 @@
     <button id="submit-button">Send</button>
 
     <script>
-     const chatContainer = document.getElementById("chat-container");
+const chatContainer = document.getElementById("chat-container");
 const userInput = document.getElementById("user-input");
 const submitButton = document.getElementById("submit-button");
 const apiKey = "3045dd712ffe6e702e3245525ac7fa38";
@@ -176,6 +176,11 @@ function sendMessage() {
 function processUserMessage(message) {
   const lowercaseMessage = message.toLowerCase();
 
+  if (lowercaseMessage.startsWith("can you")) {
+    handleCanYouRequest(lowercaseMessage);
+    return;
+  }
+
   for (const [category, keywords] of Object.entries(categories)) {
     if (containsAny(lowercaseMessage, keywords)) {
       respondToCategory(category);
@@ -189,78 +194,100 @@ function containsAny(str, substrings) {
   return substrings.some(substring => str.includes(substring));
 }
 
-function respondToCategory(category) {
-  switch (category) {
-    case "greeting":
+function handleCanYouRequest(message) {
+  const task = message.replace("can you ", "").trim();
+  let response;
+
+  switch (true) {
+    case containsAny(task, categories.greeting):
+      response = "Yes, I can greet you!";
       respondWithRandom(predefinedResponses.greetings);
       break;
-    case "howAreYou":
+    case containsAny(task, categories.howAreYou):
+      response = "Yes, I can tell you how I'm doing!";
       respondWithRandom(predefinedResponses.howAreYou);
       break;
-    case "weather":
+    case containsAny(task, categories.weather):
+      response = "Yes, I can get the weather for you!";
       getWeather();
       break;
-    case "time":
+    case containsAny(task, categories.time):
+      response = "Yes, I can tell you the current time!";
       respondToTime();
       break;
-    case "news":
+    case containsAny(task, categories.news):
+      response = "Yes, I can get the latest news for you!";
       getNews();
       break;
-    case "joke":
+    case containsAny(task, categories.joke):
+      response = "Yes, I can tell you a joke!";
       respondWithRandom(predefinedResponses.jokes);
       break;
-    case "riddle":
+    case containsAny(task, categories.riddle):
+      response = "Yes, I can tell you a riddle!";
       respondWithRandom(predefinedResponses.riddles);
       break;
-    case "quote":
+    case containsAny(task, categories.quote):
+      response = "Yes, I can share a quote with you!";
       respondWithRandom(predefinedResponses.quotes);
       break;
-    case "trivia":
+    case containsAny(task, categories.trivia):
+      response = "Yes, I can share some trivia with you!";
       respondWithRandom(predefinedResponses.trivia);
       break;
-    case "advice":
-      respondWithRandom(predefinedResponses.advice);
-      break;
-    case "scienceFact":
+    case containsAny(task, categories.scienceFact):
+      response = "Yes, I can share a science fact with you!";
       respondWithRandom(predefinedResponses.scienceFacts);
       break;
-    case "technologyInfo":
+    case containsAny(task, categories.technologyInfo):
+      response = "Yes, I can share some technology information with you!";
       respondWithRandom(predefinedResponses.technologyFacts);
       break;
-    case "movieRecommendation":
+    case containsAny(task, categories.movieRecommendation):
+      response = "Yes, I can recommend a movie!";
       recommendMovie();
       break;
-    case "songSuggestion":
+    case containsAny(task, categories.songSuggestion):
+      response = "Yes, I can suggest a song!";
       suggestSong();
       break;
-    case "scienceQuote":
+    case containsAny(task, categories.scienceQuote):
+      response = "Yes, I can share a science quote!";
       respondWithRandom(predefinedResponses.scienceQuotes);
       break;
-    case "favoriteColor":
+    case containsAny(task, categories.favoriteColor):
+      response = "Yes, I can tell you my favorite color!";
       respondToFavoriteColor();
       break;
-    case "favoriteMovie":
+    case containsAny(task, categories.favoriteMovie):
+      response = "Yes, I can tell you my favorite movie!";
       respondToFavoriteMovie();
       break;
-    case "favoriteMusic":
+    case containsAny(task, categories.favoriteMusic):
+      response = "Yes, I can tell you my favorite music!";
       respondToFavoriteMusic();
       break;
-    case "favoriteSport":
+    case containsAny(task, categories.favoriteSport):
+      response = "Yes, I can tell you my favorite sport!";
       respondToFavoriteSport();
       break;
-    case "favoriteBook":
+    case containsAny(task, categories.favoriteBook):
+      response = "Yes, I can tell you my favorite book!";
       respondToFavoriteBook();
       break;
-    case "programming":
+    case containsAny(task, categories.programming):
+      response = "Yes, I can help with programming!";
       respondToProgramming();
       break;
-    case "videoGames":
+    case containsAny(task, categories.videoGames):
+      response = "Yes, I can talk about video games!";
       videogames();
       break;
     default:
-      defaultResponse();
+      response = "Sorry, I can't help with that.";
       break;
   }
+  appendMessage("Fire AI", response);
 }
 
 function getWeather() {
@@ -377,6 +404,67 @@ function defaultResponse() {
   respondWithRandom(responses);
 }
 
+function respondToFavoriteColor() {
+  const responses = [
+    "My favorite color is blue.",
+    "I don't have a favorite color, but I like all the colors!",
+    "Colors are fascinating, aren't they?",
+  ];
+  respondWithRandom(responses);
+}
+
+function respondToFavoriteMovie() {
+  const responses = [
+    "I'm an AI, so I don't watch movies, but I've heard 'The Matrix' is great!",
+    "There are so many good movies out there. What's your favorite?",
+    "Movies can be a great way to relax and unwind.",
+  ];
+  respondWithRandom(responses);
+}
+
+function respondToFavoriteMusic() {
+  const responses = [
+    "I don't have personal preferences, but I've heard classical music is quite soothing.",
+    "Music is a universal language that connects us all.",
+    "What's your favorite genre of music?",
+  ];
+  respondWithRandom(responses);
+}
+
+function respondToFavoriteSport() {
+  const responses = [
+    "I don't play sports, but I admire the dedication and skill of athletes.",
+    "Sports are a great way to stay active and healthy.",
+    "What's your favorite sport?",
+  ];
+  respondWithRandom(responses);
+}
+
+function respondToFavoriteBook() {
+  const responses = [
+    "I enjoy reading information to expand my knowledge.",
+    "Books can take you to different worlds and broaden your perspective.",
+    "What's your favorite book?",
+  ];
+  respondWithRandom(responses);
+}
+
+function respondToProgramming() {
+  const responses = [
+    "I love helping with coding questions! What programming language are you interested in?",
+    "Programming is a powerful skill that allows you to create amazing things.",
+    "Coding can be challenging, but it's also incredibly rewarding.",
+  ];
+  respondWithRandom(responses);
+}
+
+function videogames() {
+  const responses = [
+    "I am merely an AI, but my database tells me the most popular video games include Fortnite, Roblox, Minecraft, Zelda, Mario Kart, Retro Bowl, 1v1 lol, and Tetris.",
+    "I like all games, but the one in mind seems great.",
+  ];
+  respondWithRandom(responses);
+}
     </script>
   </body>
 </html>
